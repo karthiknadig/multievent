@@ -46,9 +46,9 @@ def wait_for_multiple_events(events, mode=MODE_ANY, count=0, cancel=None):
 
     Return
     ------
-    Returns a tuple of wait function and stop function. Waiter can be called multiple
-    times when using timeout. Wait function throws TimeoutError when trigger is not
-    set within the specified timeout. Stopper can be used to stop monitoring.
+    Returns a wait function. Waiter can be called multiple times when using timeout.
+    The wait functions behaves same as the threading.Event.wait(). You can cancel wait,
+    using the CancelWait instance passed to wait_for_multiple_events.
     """
     assert mode and mode in (MODE_ANY, MODE_ALL, MODE_COUNT)
     assert events and (len(events) > 0 and len(events) < 16)

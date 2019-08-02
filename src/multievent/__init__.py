@@ -35,6 +35,7 @@ def wait_for_multiple_events(events, mode=MODE_ANY, count=0, create_thread=threa
     _set_count_lock = threading.Lock()
     _set_count = 0
     _core_event = threading.Event()
+    _core_event.clear()
     _threads = []
 
     def __check():
@@ -55,8 +56,6 @@ def wait_for_multiple_events(events, mode=MODE_ANY, count=0, create_thread=threa
     # force stop monitoring
     def __stop():
         _core_event.set()
-
-    _core_event.clear()
 
     def __worker(e):
         while not (e.is_set() or _core_event.is_set()):

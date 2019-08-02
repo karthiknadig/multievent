@@ -5,22 +5,43 @@ import os.path
 import sys
 from setuptools import setup  # noqa
 
+pure = None
+if '--pure' in sys.argv:
+    pure = True
+    sys.argv.remove('--pure')
+elif '--universal' in sys.argv:
+    pure = True
+
+
 with open("DESCRIPTION.md", "r") as fh:
     long_description = fh.read()
 
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import versioneer  # noqa
-
 del sys.path[0]
+
+try:
+    from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
+
+    class bdist_wheel(_bdist_wheel):
+        def finalize_options(self):
+            _bdist_wheel.finalize_options(self)
+            self.root_is_pure = pure
+
+except ImportError:
+    bdist_wheel = None
 
 
 if __name__ == "__main__":
+    cmds = versioneer.get_cmdclass()
+    cmds['bdist_wheel'] = bdist_wheel
+
     extras = {}
     setup(
-        name="ptvsd",
+        name="multievent",
         version=versioneer.get_version(),
-        description="Remote debugging server for Python support in Visual Studio and Visual Studio Code",  # noqa
+        description="Wait for multiple events simultaneously",  # noqa
         long_description=long_description,
         long_description_content_type="text/markdown",
         license="MIT",
@@ -42,6 +63,6 @@ if __name__ == "__main__":
         ],
         package_dir={"": "src"},
         packages=["multievent"],
-        cmdclass=versioneer.get_cmdclass(),
+        cmdclass=cmds,
         **extras
     )

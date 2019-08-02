@@ -26,17 +26,17 @@ def wait_for_multiple_events(events, mode=MODE_ANY, count=0):
     times when using timeout. Wait function throws TimeoutError when trigger is not
     set within the specified timeout. Stopper can be used to stop monitoring.
     """
-    assert mode in (MODE_ANY, MODE_ALL, MODE_COUNT)
-    assert len(events) > 0 and len(events) < 16
+    assert mode and mode in (MODE_ANY, MODE_ALL, MODE_COUNT)
+    assert events and (len(events) > 0 and len(events) < 16)
     if mode == MODE_COUNT:
-        assert count >= 0 and count <= len(events)
+        assert count and count > 0 and count <= len(events)
 
     _events = list(events)
     _set_count_lock = threading.Lock()
     _set_count = 0
     _core_event = threading.Event()
-
     _threads = []
+
     def __check():
         with _set_count_lock:
             if mode == MODE_ANY:
@@ -59,6 +59,7 @@ def wait_for_multiple_events(events, mode=MODE_ANY, count=0):
         _core_event.set()
 
     _core_event.clear()
+
     def __worker(e):
         while not (e.is_set() or _core_event.is_set()):
             try:

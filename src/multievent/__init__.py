@@ -41,6 +41,9 @@ def wait_for_multiple_events(events, mode=MODE_ANY, count=0, cancel=None):
     count : integer
         Number of events to wait on when using MODE_COUNT.
 
+    cancel : CancelWait
+        Allows cancelling the wait.
+
     Return
     ------
     Returns a tuple of wait function and stop function. Waiter can be called multiple

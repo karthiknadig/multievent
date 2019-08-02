@@ -6,7 +6,7 @@ from multievent import wait_for_multiple_events, MODE_ANY, MODE_ALL, MODE_COUNT
 @pytest.mark.parametrize("mode", [None, 12345])
 def test_bad_mode(mode):
     with pytest.raises(AssertionError):
-        wait, _ = wait_for_multiple_events([], mode=mode)
+        wait = wait_for_multiple_events([], mode=mode)
 
 
 @pytest.mark.parametrize("mode", [MODE_ANY, MODE_ALL, MODE_COUNT])
@@ -21,4 +21,4 @@ def test_any_invalid(mode, n):
 @pytest.mark.parametrize("e", [None, []])
 def test_bad_event(mode, e):
     with pytest.raises(AssertionError):
-        wait, _ = wait_for_multiple_events(e, mode=MODE_ALL)
+        wait_for_multiple_events(e, mode=mode)

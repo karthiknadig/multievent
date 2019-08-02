@@ -5,7 +5,28 @@ MODE_ALL = 2
 MODE_COUNT = 3
 
 
-def wait_for_multiple_events(events, mode=MODE_ANY, count=0, create_thread=threading.Thread):
+class ReuseCancelWaitError(Exception):
+    pass
+
+
+class CancelWait(object):
+    def __init__(self):
+        self._event = None
+
+    def cancel(self):
+        if self._event:
+            self._event.set()
+
+    def _setup(self, e):
+        if self._event is not None:
+            raise ReuseCancelWaitError()
+        self._event = e
+
+    def __call__(self):
+        self.cancel()
+
+
+def wait_for_multiple_events(events, mode=MODE_ANY, count=0, cancel=None):
     """Helper to wait for multiple events based on a trigger criteria.
     Parameters
     ----------
@@ -37,6 +58,8 @@ def wait_for_multiple_events(events, mode=MODE_ANY, count=0, create_thread=threa
     _core_event = threading.Event()
     _core_event.clear()
     _threads = []
+    if cancel is not None:
+        cancel._setup(_core_event)
 
     def __check():
         with _set_count_lock:
@@ -52,10 +75,6 @@ def wait_for_multiple_events(events, mode=MODE_ANY, count=0, create_thread=threa
 
     def __wait(timeout=None):
         return _core_event.wait(timeout)
-
-    # force stop monitoring
-    def __stop():
-        _core_event.set()
 
     def __worker(e):
         while not (e.is_set() or _core_event.is_set()):
@@ -73,4 +92,4 @@ def wait_for_multiple_events(events, mode=MODE_ANY, count=0, create_thread=threa
     for t in _threads:
         t.start()
 
-    return __wait, __stop
+    return __wait

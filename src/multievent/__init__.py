@@ -96,9 +96,7 @@ def wait_for_multiple_events(events, mode=MODE_ANY, count=0, cancel=None):
 
     def __worker(e):
         while not (e.is_set() or _core_event.is_set()):
-            if not e.wait(0.1):
-                if _core_event.is_set():
-                    return
+            e.wait(0.1)
         with _counter_lock:
             if e.is_set():
                 _counter.increment()

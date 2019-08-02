@@ -1,5 +1,4 @@
 import pytest
-import threading
 from tests.helper import events_tester
 from multievent import wait_for_multiple_events, MODE_ANY
 

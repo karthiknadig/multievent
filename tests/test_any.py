@@ -16,8 +16,7 @@ def test_any_basic(n):
 def test_any_with_timeout(n):
     with events_tester(n) as events:
         wait, _ = wait_for_multiple_events(events, mode=MODE_ANY)
-        with pytest.raises(TimeoutError):
-            wait(0.01)
+        assert not wait(0.01)
         events[0].set()
         wait()
 

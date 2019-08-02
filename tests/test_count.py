@@ -9,8 +9,7 @@ def test_count_basic(n):
     with events_tester(n) as events:
         wait, _ = wait_for_multiple_events(events, mode=MODE_COUNT, count=n)
         events[0].set()
-        with pytest.raises(TimeoutError):
-            wait(0.1)
+        assert not wait(0.1)
         set_all(events)
         wait()
 
@@ -22,8 +21,7 @@ def test_count_set(n):
         wait, _ = wait_for_multiple_events(events, mode=MODE_COUNT, count=count)
         for i in range(0, count - 1):
             events[i].set()
-        with pytest.raises(TimeoutError):
-            wait(0.1)
+        assert not wait(0.1)
         events[count - 1].set()
         wait()
 

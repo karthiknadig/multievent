@@ -5,7 +5,7 @@ MODE_ALL = 2
 MODE_COUNT = 3
 
 
-def wait_for_multiple_events(events, mode=MODE_ANY, count=0):
+def wait_for_multiple_events(events, mode=MODE_ANY, count=0, create_thread=threading.Thread):
     """Helper to wait for multiple events based on a trigger criteria.
     Parameters
     ----------
@@ -50,9 +50,7 @@ def wait_for_multiple_events(events, mode=MODE_ANY, count=0):
                     _core_event.set()
 
     def __wait(timeout=None):
-        _core_event.wait(timeout)
-        if not _core_event.is_set():
-            raise TimeoutError()
+        return _core_event.wait(timeout)
 
     # force stop monitoring
     def __stop():
@@ -62,9 +60,7 @@ def wait_for_multiple_events(events, mode=MODE_ANY, count=0):
 
     def __worker(e):
         while not (e.is_set() or _core_event.is_set()):
-            try:
-                e.wait(0.1)
-            except TimeoutError:
+            if not e.wait(0.1):
                 if _core_event.is_set():
                     return
         with _set_count_lock:

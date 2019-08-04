@@ -46,14 +46,16 @@ wait = wait_for_multiple_events(events, cancel=cancel)
 
 def _run_this():
     time.sleep(5)
-    cancel()
+    cancel()  # see NOTE below.
 
 t = threading.Thread(target=_run_this)
 t.start()
 
-# wait is blocked until either one fo the events is set or
+# wait is blocked until either one of the events is set or
 # cancel is called
 wait()
+# NOTE: Cancellation ends all monitoring. You have to call
+# wait_for_multiple_events, and get a new wait function.
 ```
 
 #### Wait for specified count of events
@@ -62,7 +64,7 @@ wait()
 events = [threading.Event() for _ in range(0, 5)]
 
 # Default is ANY
-wait = wait_for_multiple_events(events, mdoe=MODE_COUNT, count=3) 
+wait = wait_for_multiple_events(events, mode=MODE_COUNT, count=3) 
 
 # wait blocks until three events are set.
 wait()
